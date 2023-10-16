@@ -1,0 +1,66 @@
+class VacuumCleaner:
+    def __init__(self, grid):
+        self.grid = grid
+        self.rows = len(grid)
+        self.cols = len(grid[0])
+        self.position = (0, 0)
+        self.cleaned = set()
+    def is_dirty(self, position):
+        x, y = position
+        return self.grid[x][y] == 1
+    def clean(self, position):
+        x, y = position
+        self.cleaned.add(position)
+        self.grid[x][y] = 0
+    def move_left(self):
+        x, y = self.position
+        if y > 0:
+            self.position = (x, y - 1)
+    def move_right(self):
+        x, y = self.position
+        if y < self.cols - 1:
+            self.position = (x, y + 1)
+    def move_up(self):
+        x, y = self.position
+        if x > 0:
+            self.position = (x - 1, y)
+    def move_down(self):
+        x, y = self.position
+        if x < self.rows - 1:
+            self.position = (x + 1, y)
+    def is_goal_state(self):
+        return all(self.grid[x][y] == 0 for x in range(self.rows) for y in range(self.cols))
+    def clean_room(self):
+        while not self.is_goal_state():
+            if self.is_dirty(self.position):
+                self.clean(self.position)
+            else:
+                x, y = self.position
+                dirty_cells = [(i, j) for i in range(self.rows) for j in range(self.cols) if self.is_dirty((i, j))]
+                nearest_dirty_cell = min(dirty_cells, key=lambda cell: abs(x - cell[0]) + abs(y - cell[1]))
+                dx, dy = nearest_dirty_cell[0] - x, nearest_dirty_cell[1] - y
+                if dx > 0:
+                    self.move_down()
+                elif dx < 0:
+                    self.move_up()
+                elif dy > 0:
+                    self.move_right()
+                elif dy < 0:
+                    self.move_left()
+    def print_grid(self):
+        for row in self.grid:
+            print(row)
+if __name__ == "__main__":
+    grid = [
+        [1, 0, 0, 1],
+        [0, 1, 0, 1],
+        [1, 1, 0, 0],
+        [0, 0, 0, 1]
+    ]
+    vacuum = VacuumCleaner(grid)
+    print("Initial grid:")
+    vacuum.print_grid()
+    print("\nCleaning the room...")
+    vacuum.clean_room()
+    print("\nFinal grid:")
+    vacuum.print_grid()
